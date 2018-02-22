@@ -37,10 +37,6 @@ const todos = (state = [], action) => {
   }
 };
 
-const toggleTodo = (state = []) => {
-
-};
-
 const testAddTodo = () => {
   const stateBefore = [];
   const action = {
