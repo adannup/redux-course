@@ -1,30 +1,37 @@
 const expect = require('expect');
 const deepFreeze = require('deep-freeze');
 
+const todo = (state, action) => {
+    switch (action.type) {
+      case 'ADD_TODO':
+        return {
+          id: action.id,
+          text: action.text,
+          completed: false,
+        };
+      case 'TOGGLE_TODO':
+        if(state.id === action.id) {
+          // return Object.assign({}, todo, { completed: !todo.completed });
+          return {
+            ...state,
+            completed: !state.completed,
+          }
+        }
+        return state;
+      default:
+        return state;
+    }
+};
+
 const todos = (state = [], action) => {
   switch (action.type) {
     case 'ADD_TODO':
       return [
         ...state,
-        {
-          id: action.id,
-          text: action.text,
-          completed: false,
-        }
+        todo(undefined, action)
       ];
     case 'TOGGLE_TODO':
-      return state.map(todo => {
-        if(action.id === todo.id) {
-          // return Object.assign({}, todo, {
-          //   completed: !todo.completed,
-          // });
-          return {
-            ...todo,
-            completed: !todo.completed,
-          }
-        }
-        return todo;
-      });
+      return state.map(t => todo(t, action));
     default:
       return state;
   }
