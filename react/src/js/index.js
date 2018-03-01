@@ -54,51 +54,74 @@ const todoApp = combineReducers({
 });
 const store = createStore(todoApp);
 
+const Link = ({ active, children, onClick }) => {
+  if(active) {
+    return <span>{children}</span>
+  }
+  return (
+    <a
+      href="#"
+      onClick={e => {
+        e.preventDefault();
+        onClick();
+      }}
+    >
+      {children}
+    </a>
+  );
+}
+
 class FilterLink extends Component {
-  onClickHandleFilter = e => {
-    e.preventDefault();
-    this.props.onClick(this.props.filter);
+  componentDidMount() {
+    this.unsubscribe = store.subscribe(() => {
+      this.forceUpdate();
+    });
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe();
+  }
+
+  onClickHandleFilter = () => {
+    store.dispatch({
+      type: 'SET_VISIBILITY_FILTER',
+      filter: this.props.filter,
+    });
   }
 
   render() {
-    if(this.props.filter === this.props.currentFilter) {
-      return <span>{this.props.children}</span>
-    }
+    const props = this.props;
+    const state = store.getState();
+
     return (
-      <a
-        href="#"
+      <Link
+        active={props.filter === state.visibilityFilter}
         onClick={this.onClickHandleFilter}
       >
-        {this.props.children}
-      </a>
+        {props.children}
+      </Link>
     );
   }
 }
 
-const Footer = ({ visibilityFilter, onFilterClick }) => (
+const Footer = () => (
   <p>
     Show:
     {' '}
     <FilterLink
       filter='SHOW_ALL'
-      currentFilter={visibilityFilter}
-      onClick={onFilterClick}
     >
       All
     </FilterLink>
     {' '}
     <FilterLink
       filter='SHOW_ACTIVE'
-      currentFilter={visibilityFilter}
-      onClick={onFilterClick}
     >
       Active
     </FilterLink>
     {' '}
     <FilterLink
       filter='SHOW_COMPLETED'
-      currentFilter={visibilityFilter}
-      onClick={onFilterClick}
     >
       Completed
     </FilterLink>
@@ -169,13 +192,6 @@ class TodoApp extends Component {
     });
   }
 
-  onClickFilter = filter => {
-    store.dispatch({
-      type: 'SET_VISIBILITY_FILTER',
-      filter,
-    });
-  }
-
   render() {
     const { todos, visibilityFilter } = this.props;
     const visibleTodos = getVisibleTodos(todos, visibilityFilter);
@@ -187,10 +203,7 @@ class TodoApp extends Component {
           todos={visibleTodos}
           onTodoClick={this.onClickToggleTodo}
         />
-        <Footer
-          visibilityFilter={visibilityFilter}
-          onFilterClick={this.onClickFilter}
-        />
+        <Footer />
       </div>
     )
   }
