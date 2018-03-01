@@ -13,7 +13,7 @@ const todo = (state, action) => {
         };
       case 'TOGGLE_TODO':
         if(state.id === action.id) {
-          return Object.assign({}, todo, { completed: !todo.completed });
+          return Object.assign({}, state, { completed: !state.completed });
           // return {
           //   ...state,
           //   completed: !state.completed,
@@ -66,6 +66,13 @@ class TodoApp extends Component {
     this.textInput.value = '';
   }
 
+  onClickToggleTodo = (id) => {
+    store.dispatch({
+      type: 'TOGGLE_TODO',
+      id: id,
+    });
+  }
+
   render() {
     return (
       <div>
@@ -73,7 +80,11 @@ class TodoApp extends Component {
         <button onClick={this.onClickAddTodo}>Add Todo</button>
         <ul>
           {this.props.todos.map(todo => (
-            <li key={todo.id}>
+            <li
+              key={todo.id}
+              onClick={() => this.onClickToggleTodo(todo.id)}
+              style={{ textDecoration: todo.completed ? 'line-through' : 'none'}}
+            >
               {todo.text}
             </li>
           ))}
