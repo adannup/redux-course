@@ -78,6 +78,29 @@ class FilterLink extends Component {
   }
 }
 
+const Todo = ({ onClick, completed, text }) => (
+  <li
+    onClick={onClick}
+    style={{ textDecoration: completed ? 'line-through' : 'none'}}
+  >
+    {text}
+  </li>
+);
+
+const TodoList = ({ todos, onTodoClick }) => (
+  <ul>
+    {todos.map(todo =>
+      <Todo
+        key={todo.id}
+        // completed={todo.completed}
+        // text={todo.text}
+        {...todo}
+        onClick={() => onTodoClick(todo.id)}
+      />
+    )}
+  </ul>
+);
+
 const getVisibleTodos = (todos, filter) => {
   switch (filter) {
     case 'SHOW_ALL':
@@ -116,17 +139,10 @@ class TodoApp extends Component {
       <div>
         <input type="text" ref={ input => { this.textInput = input; }} />
         <button onClick={this.onClickAddTodo}>Add Todo</button>
-        <ul>
-          {visibleTodos.map(todo => (
-            <li
-              key={todo.id}
-              onClick={() => this.onClickToggleTodo(todo.id)}
-              style={{ textDecoration: todo.completed ? 'line-through' : 'none'}}
-            >
-              {todo.text}
-            </li>
-          ))}
-        </ul>
+        <TodoList
+          todos={visibleTodos}
+          onTodoClick={this.onClickToggleTodo}
+        />
         <p>
           Show:
           {' '}
